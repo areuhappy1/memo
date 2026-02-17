@@ -1,0 +1,45 @@
+const memoInput = document.getElementById('memo-input');
+const saveBtn = document.getElementById('save-btn');
+const memoList = document.getElementById('memo-list');
+const charCount = document.getElementById('char-count');
+
+// 1. 페이지 로드 시 저장된 메모 불러오기
+document.addEventListener('DOMContentLoaded', displayMemos);
+
+// 2. 글자 수 체크
+memoInput.addEventListener('input', () => {
+    const length = memoInput.value.length;
+    charCount.textContent = `${length} / 140`;
+});
+
+// 3. 메모 저장 기능
+saveBtn.addEventListener('click', () => {
+    const content = memoInput.value.trim();
+    if (!content) return;
+
+    const memoObj = {
+        id: Date.now(),
+        text: content,
+        date: new Date().toLocaleString()
+    };
+
+    // 로컬 스토리지에 저장
+    const savedMemos = JSON.parse(localStorage.getItem('myMemos') || '[]');
+    savedMemos.unshift(memoObj); // 새 메모를 맨 앞에 추가
+    localStorage.setItem('myMemos', JSON.stringify(savedMemos));
+
+    memoInput.value = '';
+    charCount.textContent = '0 / 140';
+    displayMemos();
+});
+
+// 4. 화면에 메모 출력
+function displayMemos() {
+    const savedMemos = JSON.parse(localStorage.getItem('myMemos') || '[]');
+    memoList.innerHTML = savedMemos.map(memo => `
+        <li>
+            <span class="date">${memo.date}</span>
+            <p>${memo.text}</p>
+        </li>
+    `).join('');
+}
